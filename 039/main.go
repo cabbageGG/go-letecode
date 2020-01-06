@@ -34,25 +34,29 @@ import (
 func combinationSum(candidates []int, target int) [][]int {
 	res := [][]int{}
 	sort.Ints(candidates)
-	dofunc(candidates, []int{}, &res, 0, target)
+	backtrace(candidates, []int{}, &res, 0, target, 0)
 	return res
 }
 
-func dofunc(candidates, nums []int, res *[][]int, ind, target int) bool {
-	if target == 0 {
+func backtrace(candidates, nums []int, res *[][]int, index, target, sum int) bool {
+	if sum == target {
 		t := make([]int, len(nums))
 		copy(t, nums)
 		*res = append(*res, t)
 		return true
-	} else if target < 0 {
+	} else if sum > target {
 		return false
 	}
-	for i := ind; i < len(candidates); i++ {
+	// sum < target
+	for i := index; i < len(candidates); i++ {
 		nums = append(nums, candidates[i])
-		if !dofunc(candidates, nums, res, i, target-candidates[i]) {
-			break
+		sum = sum + candidates[i]
+		// 可重复取值，所以这里传入的下一个index是i
+		if !backtrace(candidates, nums, res, i, target, sum) {
+			break // 这里剪枝
 		}
 		nums = nums[:len(nums)-1]
+		sum = sum - candidates[i]
 	}
 	return true
 }
